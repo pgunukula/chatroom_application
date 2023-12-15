@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f7f4; /* Light green background */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('https://png.pngtree.com/thumb_back/fh260/back_our/20190625/ourmid/pngtree-rainy-weather-with-bad-weather-image_260457.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        #weather-container {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 80%;
+            max-width: 1500px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 5%;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #forecast {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .weather-card {
+            margin: 10px;
+            padding: 20px;
+            border-radius: 8px;
+            width: calc(25% - 20px); /* Four cards per row with margin */
+            box-sizing: border-box;
+            background-color: rgba(224, 242, 241, 0.9);
+        }
+
+        .day {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .date-time {
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .temperature {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .humidity {
+            color: #777;
+        }
+
+        .weather-icon {
+            width: 70px;
+            height: 70px;
+        }
+
+        input {
+            padding: 8px;
+            margin: 10px 0;
+            width: 80%;
+        }
+
+        #error-message {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .welcome-message {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        .logout-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-align: left;
+        }
+
+        .logout-button button {
+            background-color: #f44336;
+            color: #FFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .logout-button button:hover {
+            background-color: #d32f2f;
+        }
+
+        .home-button {
+            position: absolute;
+            top: 20px;
+            left: 100px;
+            text-align: left;
+        }
+
+        .home-button1 {
+            position: absolute;
+            top: 20px;
+            left: 170px;
+            text-align: left;
+        }
+
+        .home-button2 {
+            position: absolute;
+            top: 20px;
+            left: 235px;
+            text-align: left;
+        }
+
+        .home-button button {
+            background-color: #4a36f4;
+            color: #FFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .home-button1 button {
+            background-color: #52a94f;
+            color: #FFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .home-button2 button {
+            background-color: #d4c021;
+            color: #FFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+ <div class="welcome-message">
+        <p>Welcome, {{session['username']}}!</p>
+    </div>
+  <div class="logout-button">
+    <button id="logout-btn" onclick="location.href='/logout'" type="button">Logout</button>
+  </div>
+  <div class="home-button">
+    <button id="home-btn" onclick="location.href='/news'" type="button">News</button>
+  </div>
+      <div class="home-button1">
+    <button id="weather-btn" onclick="location.href='/home'" type="button">Chat</button>
+  </div>
+
+ <div class="home-button2">
+    <button id="game-btn" onclick="location.href='/game'" target="_blank" type="button">Game</button>
+  </div>
+    <div id="weather-container">
+        <h1>Weather Forecast</h1>
+        <input type="text" id="location" placeholder="Enter location">
+        <button onclick="getWeather()" style = "      padding: 10px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            width: 20%;
+            border-radius: 20px;">Get Weather</button>
+
+        <div id="forecast" style="display: none;"></div>
+        <div id="error-message"></div>
+    </div>
+
+    <script>
+        function getWeather() {
+            const locationInput = document.getElementById('location');
+            const location = locationInput.value;
+
+            // Use your OpenWeatherMap API key here
+            const apiKey = 'bbf3391b63443a85f94e914c8bf39fd9';
+            const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${location}&units=metric&appid=${apiKey}`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('City not found. Please enter a valid location.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayWeather(data);
+                })
+                .catch(error => {
+                    displayError(error.message);
+                });
+        }
+
+ function displayWeather(data) {
+            const forecastContainer = document.getElementById('forecast');
+            forecastContainer.style.display = 'flex';
+            forecastContainer.innerHTML = '';
+
+            const entriesPerDay = 5;
+            const entriesByDay = {};
+
+            data.list.forEach(item => {
+                const date = new Date(item.dt * 1000);
+                const day = date.toLocaleDateString('en-US', { weekday: 'long' });
+
+                if (!entriesByDay[day]) {
+                    entriesByDay[day] = [];
+                }
+
+                if (entriesByDay[day].length < entriesPerDay) {
+                    entriesByDay[day].push(item);
+                }
+            });
+
+            Object.keys(entriesByDay).forEach(day => {
+                entriesByDay[day].forEach(item => {
+                    const date = new Date(item.dt * 1000);
+                    const dateAndTime = date.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+                    const temperature = item.main.temp.toFixed(1);
+                    const description = item.weather[0].description;
+                    const humidity = item.main.humidity;
+                    const iconCode = item.weather[0].icon;
+                    const iconUrl = `http://openweathermap.org/img/w/${iconCode}.png`;
+
+                    const weatherCard = document.createElement('div');
+                    weatherCard.className = 'weather-card';
+
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'day';
+                    dayElement.textContent = day;
+
+                    const dateElement = document.createElement('div');
+                    dateElement.className = 'date-time';
+                    dateElement.textContent = dateAndTime;
+
+                    const temperatureElement = document.createElement('div');
+                    temperatureElement.className = 'temperature';
+                    temperatureElement.textContent = `${temperature} °C`;
+
+                    const descriptionElement = document.createElement('div');
+                    descriptionElement.className = 'description';
+                    descriptionElement.textContent = description;
+
+                    const humidityElement = document.createElement('div');
+                    humidityElement.className = 'humidity';
+                    humidityElement.textContent = `Humidity: ${humidity}%`;
+
+                    const iconElement = document.createElement('img');
+                    iconElement.className = 'weather-icon';
+                    iconElement.src = iconUrl;
+                    iconElement.alt = description;
+
+                    weatherCard.appendChild(dayElement);
+                    weatherCard.appendChild(dateElement);
+                    weatherCard.appendChild(temperatureElement);
+                    weatherCard.appendChild(descriptionElement);
+                    weatherCard.appendChild(humidityElement);
+                    weatherCard.appendChild(iconElement);
+
+                    forecastContainer.appendChild(weatherCard);
+                });
+            });
+             clearError();
+        }
+
+        function displayError(message) {
+            const errorMessageElement = document.getElementById('error-message');
+            errorMessageElement.textContent = message;
+
+            const forecastContainer = document.getElementById('forecast');
+            forecastContainer.style.display = 'none';
+        }
+
+        function clearError() {
+            const errorMessageElement = document.getElementById('error-message');
+            errorMessageElement.textContent = '';
+        }
+    </script>
+</body>
+</html>

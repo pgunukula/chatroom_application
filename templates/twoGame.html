@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+  <title>Games</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      background-color: #f5f5f5;
+      color: #333;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .game-selector {
+      display: flex;
+      justify-content: space-between;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .card {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      line-height: 3rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    #container-guess {
+      display: none;
+    }
+
+     h1 {
+      color: #3498db;
+    }
+
+    #container {
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 400px;
+    }
+
+    #container1 {
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 400px;
+    }
+
+    #word-container {
+      font-size: 24px;
+      margin-bottom: 20px;
+      letter-spacing: 10px;
+    }
+
+    #guesses-container {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: red;
+    }
+
+    #result {
+      font-size: 20px;
+      color: green;
+      margin-bottom: 10px;
+    }
+
+    #keyboard {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .key {
+      background-color: #3498db;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .key:hover {
+      background-color: #2980b9;
+    }
+
+    .correct {
+      color: green;
+    }
+
+    .incorrect {
+      color: red;
+    }
+
+    #refresh-btn {
+      background-color: #3498db;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    #refresh-btn:hover {
+      background-color: #2980b9;
+    }
+
+    #refresh-btn1 {
+      background-color: #40a430;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    #refresh-btn1:hover {
+      background-color: #257618;
+    }
+
+    #refresh-btn-guess {
+      background-color: #3498db;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    #refresh-btn-guess:hover {
+      background-color: #2980b9;
+    }
+    #guess-number {
+      font-size: 16px;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 80%;
+      box-sizing: border-box;
+    }
+
+    #guess-number:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 5px rgba(52, 152, 219, 0.7);
+    }
+
+    #result-guess{
+      font-size: 20px;
+      color: red;
+      margin-bottom: 10px;
+    }
+
+    #back-btn,
+    #back-btn1 {
+      background-color: #db3434;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+  </style>
+</head>
+<body>
+    <div class="welcome-message">
+    <p>Welcome, {{session['username']}}!</p>
+  </div>
+  <div class="logout-button">
+    <button id="logout-btn" onclick="location.href='/logout'" type="button">Logout</button>
+  </div>
+  <div class="home-button">
+    <button id="home-btn" onclick="location.href='/news'" type="button">News</button>
+  </div>
+  <div class="home-button1">
+    <button id="weather-btn" onclick="location.href='/weather'" type="button">Weather</button>
+  </div>
+     <div class="home-button2">
+    <button id="game-btn" onclick="location.href='/home'" target="_blank" type="button">Chat</button>
+  </div>
+
+  <div id="game-selector" class="game-selector">
+    <div class="card" onclick="selectGame('hangman')">
+      <h1>Hangman</h1>
+      <p>Guess the word</p>
+    </div>
+    <div class="card" onclick="selectGame('guess')">
+      <h1>Guess Game</h1>
+      <p>Guess the number</p>
+    </div>
+  </div>
+
+  <div id="container" style="display: none;">
+    <h1>Hangman Game</h1>
+
+    <div id="word-container"></div>
+    <div id="guesses-container"></div>
+    <div id="result"></div>
+
+    <div id="keyboard"></div>
+    <button id="refresh-btn" onclick="refreshGame()">Refresh</button>
+    <br>
+        <button id="back-btn1" onclick="goBack()">Back to Selection</button>
+  </div>
+
+  <div id="container1" style="display: none;">
+    <h1>Guess Game</h1>
+
+    <input type="number" id="guess-number" placeholder="Enter your guess">
+    <div id="result-guess"></div>
+    <button id="refresh-btn1" onclick="checkGuess()">Check</button>
+    <button id="refresh-btn-guess" onclick="refreshGameGuess()">Refresh</button>
+    <br>
+        <button id="back-btn" onclick="goBack()">Back to Selection</button>
+
+</div>
+    <script>
+      let secretNumber = Math.floor(Math.random() * 100) + 1;
+
+      function checkGuess() {
+        const userGuess = document.getElementById('guess-number').valueAsNumber;
+
+        if (isNaN(userGuess)) {
+          document.getElementById('result-guess').textContent = 'Please enter a valid number.';
+        } else {
+          if (userGuess === secretNumber) {
+            document.getElementById('result-guess').textContent = 'Congratulations! You guessed it!';
+            document.getElementById('result-guess').style.color = 'green';
+          } else if (userGuess < secretNumber) {
+            document.getElementById('result-guess').textContent = 'Too low! Try again.';
+          } else {
+            document.getElementById('result-guess').textContent = 'Too high! Try again.';
+          }
+        }
+      }
+
+      function refreshGameGuess() {
+        secretNumber = Math.floor(Math.random() * 100) + 1;
+        document.getElementById('result-guess').textContent = '';
+        document.getElementById('guess-number').value = '';
+      }
+
+      function goBack() {
+        document.getElementById('game-selector').style.display = 'flex';
+        document.getElementById('container').style.display = 'none';
+        document.getElementById('container1').style.display = 'none';
+      }
+    </script>
+
+
+  <script>
+    function selectGame(game) {
+      document.getElementById('game-selector').style.display = 'none';
+
+      if (game === 'hangman') {
+        document.getElementById('container').style.display = 'block';
+      } else if (game === 'guess') {
+        document.getElementById('container1').style.display = 'block';
+      }
+    }
+  </script>
+  <script>
+    // Array of words for the game
+    const words = ["hangman", "javascript", "developer", "coding", "programming"];
+
+    // Choose a random word from the array
+    let selectedWord = words[Math.floor(Math.random() * words.length)];
+
+    // Initialize variables
+    let guessedWord = Array(selectedWord.length).fill('_');
+    let incorrectGuesses = [];
+    let maxAttempts = selectedWord.length + 3;
+    let attempts = maxAttempts;
+    let gameEnded = false;
+
+    // Display the initial state of the game
+    updateGame();
+
+    // Function to update the game display
+    function updateGame() {
+      document.getElementById("word-container").innerHTML = guessedWord.map((letter, index) => {
+        if (letter === "_") {
+          return '<span class="hidden-char">_</span>';
+        } else {
+          return `<span class="correct">${letter}</span>`;
+        }
+      }).join(' ');
+      console.log(incorrectGuesses);
+      if (incorrectGuesses.length > 0) {
+         document.getElementById("guesses-container").textContent = `Incorrect Guesses: ${incorrectGuesses.join(', ')}`;
+      }
+      document.getElementById("result").textContent = '';
+
+      // Check if the player has won
+      if (!guessedWord.includes('_')) {
+        document.getElementById("result").textContent = 'Congratulations! You won!';
+        gameEnded = true;
+      }
+
+      // Check if the player has lost
+      if (attempts === 0) {
+        document.getElementById("result").textContent = `Sorry! You lost. The word was: ${selectedWord}`;
+        gameEnded = true;
+      }
+
+      // Disable the keyboard buttons if the game has ended
+      if (gameEnded) {
+        const keyboardButtons = document.querySelectorAll('.key');
+        keyboardButtons.forEach(button => {
+          button.disabled = true;
+        });
+      }
+    }
+
+    // Function to handle a guess
+    function makeGuess(letter) {
+      if (gameEnded) {
+        return; // Don't handle guesses if the game has ended
+      }
+
+      if (selectedWord.includes(letter)) {
+        // Correct guess
+        for (let i = 0; i < selectedWord.length; i++) {
+          if (selectedWord[i] === letter) {
+            guessedWord[i] = letter;
+          }
+        }
+      } else {
+        // Incorrect guess
+        incorrectGuesses.push(letter);
+        attempts--;
+      }
+
+      // Update the game display
+      updateGame();
+    }
+
+    // Function to refresh the game
+    function refreshGame() {
+      selectedWord = words[Math.floor(Math.random() * words.length)];
+      guessedWord = Array(selectedWord.length).fill('_');
+      incorrectGuesses = [];
+      document.getElementById("guesses-container").textContent = '';
+      attempts = maxAttempts;
+      gameEnded = false;
+      updateGame();
+
+      // Enable the keyboard buttons
+      const keyboardButtons = document.querySelectorAll('.key');
+      keyboardButtons.forEach(button => {
+        button.disabled = false;
+      });
+    }
+
+    // Event listener for key presses
+    document.addEventListener('keyup', function(event) {
+      const pressedKey = event.key.toLowerCase();
+
+      // Check if the pressed key is a letter
+      if (/[a-z]/.test(pressedKey)) {
+        // Check if the letter has been guessed before
+        if (!guessedWord.includes(pressedKey) && !incorrectGuesses.includes(pressedKey)) {
+          makeGuess(pressedKey);
+        }
+      }
+    });
+  </script>
+<script>
+
+    // Function to generate the keyboard
+    function generateKeyboard() {
+      const keyboardContainer = document.getElementById('keyboard');
+
+      for (let i = 97; i <= 122; i++) {
+        const letter = String.fromCharCode(i);
+        const button = document.createElement('button');
+        button.textContent = letter;
+        button.classList.add('key');
+        button.addEventListener('click', function() {
+          makeGuess(letter);
+        });
+        keyboardContainer.appendChild(button);
+      }
+    }
+
+    // Initialize the keyboard
+    generateKeyboard();
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+Flask==2.0.2
+Flask_MySQLdb==1.0.1
+Flask_Bcrypt==1.0.1
+requests==2.27.1
+gevent==20.12.0
+boto3==1.17.84
+Flask_SocketIO==5.3.6
+Werkzeug==2.0.2
+gevent_websocket==0.10.1
+python-socketio

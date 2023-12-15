@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles/style1.css') }}">
+<style>
+        .welcome-message {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        .logout-button {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            text-align: left;
+        }
+
+        .logout-button button {
+            background-color: #f44336;
+            color: #FFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .logout-button button:hover {
+            background-color: #d32f2f;
+        }
+
+        .home-button {
+            position: absolute;
+            top: 10px;
+            left: 100px;
+            text-align: left;
+        }
+
+        .home-button1 {
+            position: absolute;
+            top: 10px;
+            left: 170px;
+            text-align: left;
+        }
+
+        .home-button2 {
+            position: absolute;
+            top: 10px;
+            left: 260px;
+            text-align: left;
+        }
+
+        .home-button button {
+            background-color: #4a36f4;
+            color: #FFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .home-button1 button {
+            background-color: #52a94f;
+            color: #FFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .home-button2 button {
+            background-color: #d4c021;
+            color: #FFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+</style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="main-nav container flex">
+            <div class="nav-links">
+                <ul class="flex links">
+                    <li>  <div class="logout-button">
+    <button id="logout-btn" onclick="location.href='/logout'" type="button">Logout</button>
+  </div>
+</li>
+                    <li>  <div class="home-button">
+    <button id="home-btn" onclick="location.href='/home'" type="button">Chat</button>
+                    </div></li>
+                    <li>      <div class="home-button1">
+    <button id="weather-btn" onclick="location.href='/weather'" type="button">Weather</button>
+  </div></li>
+                    <li> <div class="home-button2">
+    <button id="game-btn" onclick="location.href='/game'" target="_blank" type="button">Game</button>
+  </div></li>
+                    <li class="hover-link nav-item" id="sports" onclick="onNavItemClick('sports')" style="margin-left: 56%;">Sports</li>
+                    <li class="hover-link nav-item" id="finance" onclick="onNavItemClick('finance')">Finance</li>
+                    <li class="hover-link nav-item" id="politics" onclick="onNavItemClick('politics')">Politics</li>
+                </ul>
+            </div>
+            <div class="search-bar flex" style="margin-right: 10%;">
+                <input id="search-text" type="text" class="news-input" placeholder="e.g. Science">
+                <button id="search-button" class="search-button">Search</button>
+                <div class="welcome-message">
+        <p>Welcome, {{session['username']}}!</p>
+    </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <main>
+        <div class="cards-container container flex" id="cards-container">
+
+        </div>
+    </main>
+
+    <template id="template-news-card">
+        <div class="card">
+            <div class="card-header">
+                <img src="https://via.placeholder.com/400x200" alt="news-image" id="news-img">
+            </div>
+            <div class="card-content">
+                <h3 id="news-title">This is the Title</h3>
+                <h6 class="news-source" id="news-source">End Gadget 26/08/2023</h6>
+                <p class="news-desc" id="news-desc">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Recusandae saepe quis voluptatum quisquam vitae doloremque facilis molestias quae ratione cumque!</p>
+            </div>
+        </div>
+    </template>
+
+    <script>
+const API_KEY = "4090dd65f5974f27b30446d86e451ad5";
+const url = "https://newsapi.org/v2/everything?q=";
+
+window.addEventListener("load", () => fetchNews("US"));
+
+function reload() {
+    window.location.reload();
+}
+
+async function fetchNews(query) {
+    try {
+        const res = await fetch(`${url}${query}&apiKey=${API_KEY}`);
+        if (!res.ok) {
+            throw new Error(`Failed to fetch news. Status: ${res.status}`);
+        }
+        const data = await res.json();
+        bindData(data.articles);
+    } catch (error) {
+        console.error("Error fetching news:", error);
+    }
+}
+
+function bindData(articles) {
+    const cardsContainer = document.getElementById("cards-container");
+    const newsCardTemplate = document.getElementById("template-news-card");
+
+    cardsContainer.innerHTML = "";
+
+    if (!articles || !Array.isArray(articles)) {
+        console.error("Invalid or missing articles data");
+        return;
+    }
+
+    articles.forEach((article) => {
+        if (!article.urlToImage) return;
+        const cardClone = newsCardTemplate.content.cloneNode(true);
+        fillDataInCard(cardClone, article);
+        cardsContainer.appendChild(cardClone);
+    });
+}
+
+function fillDataInCard(cardClone, article) {
+    const newsImg = cardClone.querySelector("#news-img");
+    const newsTitle = cardClone.querySelector("#news-title");
+    const newsSource = cardClone.querySelector("#news-source");
+    const newsDesc = cardClone.querySelector("#news-desc");
+
+    newsImg.src = article.urlToImage;
+    newsTitle.innerHTML = article.title;
+    newsDesc.innerHTML = article.description;
+
+    const date = new Date(article.publishedAt).toLocaleString("en-US", {
+        timeZone: "America/Chicago",
+    });
+
+    newsSource.innerHTML = `${article.source.name} · ${date}`;
+
+    cardClone.firstElementChild.addEventListener("click", () => {
+        window.open(article.url, "_blank");
+    });
+}
+
+let curSelectedNav = null;
+function onNavItemClick(id) {
+    fetchNews(id);
+    const navItem = document.getElementById(id);
+    curSelectedNav?.classList.remove("active");
+    curSelectedNav = navItem;
+    curSelectedNav.classList.add("active");
+}
+
+const searchButton = document.getElementById("search-button");
+const searchText = document.getElementById("search-text");
+
+searchButton.addEventListener("click", () => {
+    const query = searchText.value;
+    if (!query) return;
+    fetchNews(query);
+    curSelectedNav?.classList.remove("active");
+    curSelectedNav = null;
+});
+
+    </script>
+</body>
+</html>

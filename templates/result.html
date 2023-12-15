@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatroom - Result</title>
+    <style>
+        /* CSS styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F5F5F5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #FFFFFF;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .image-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .image {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .message {
+            background-color: #F8F8F8;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-button {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .nav-button a {
+            text-decoration: none;
+            color: #4CAF50;
+        }
+
+        .welcome-message {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        .logout-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-align: left;
+        }
+
+        .home-button {
+            position: absolute;
+            top: 20px;
+            left: 100px;
+            text-align: left;
+        }
+
+        .logout-button button {
+            background-color: #f44336;
+            color: #FFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .home-button button {
+            background-color: #4a36f4;
+            color: #FFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .download-button button {
+            background-color: #4e348d;
+            color: #FFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .logout-button button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Chatroom - Result</h1>
+        <div class="welcome-message">
+            <p>Welcome, {{session['username']}}!</p>
+        </div>
+        <div class="logout-button">
+            <button id="logout-btn" onclick="location.href='/logout'" type="button">Logout</button>
+        </div>
+        <div class="home-button">
+            <button id="home-btn" onclick="location.href='/home'" type="button">Home</button>
+        </div>
+
+        <div class="image-container">
+            <h3>Output File</h3>
+                <div class="download-button">
+                    <button id="download-btn" onclick="location.href='/download'" type="button">Download</button>
+                </div>
+
+        </div>
+
+        <div class="message">
+            <h3>Message</h3>
+            <p>{{ msg1 }}</p>
+            <p>{{ msg2 }}</p>
+        </div>
+    </div>
+</body>
+</html>
